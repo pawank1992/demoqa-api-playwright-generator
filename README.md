@@ -2,7 +2,26 @@
 
 Spec-driven API automation framework that converts an OpenAPI/Swagger specification into executable Playwright API tests.
 
-## One-command execution
+## Coverage generated from the specification
+
+For each operation, the generator evaluates the rules available in the OpenAPI document and generates applicable tests for:
+
+- Positive / happy-path requests
+- Expected 2xx status
+- Response content type
+- Response contract / required properties
+- No unexpected 5xx server errors
+- Missing required request-body fields
+- Invalid request data types
+- Required query-parameter validation
+- Invalid path-parameter validation
+- `minimum` / `maximum` / `minLength` / `maxLength` / `minItems` / `maxItems` boundary values
+- Enum and format-aware example data
+- GET, POST, PUT, PATCH, DELETE, HEAD and OPTIONS operations
+
+Tests are generated only when the corresponding information exists in the supplied OpenAPI specification. This prevents the framework from inventing constraints that the contract does not define.
+
+## One-click execution
 
 ```bash
 npm install
@@ -12,17 +31,22 @@ npm run api:test
 
 The command:
 
-1. Reads `specs/demoqa.yaml` (or `OPENAPI_SPEC` if supplied).
+1. Reads `specs/demoqa.yaml` or `OPENAPI_SPEC`.
 2. Validates and dereferences the OpenAPI document.
 3. Generates `generated/api.generated.spec.js`.
-4. Runs the generated tests with Playwright.
-5. Produces an HTML report in `playwright-report/`.
+4. Generates `generated/test-manifest.json` with the test inventory and category counts.
+5. Runs the generated tests with Playwright.
+6. Produces an HTML report in `playwright-report/`.
 
-Open the report with:
+Open the report:
 
 ```bash
 npm run report
 ```
+
+## GitHub Actions
+
+Every push/PR to `main` and manual **Run workflow** execute the generator and Playwright tests. The HTML report is uploaded as a workflow artifact.
 
 ## Use another specification
 
@@ -45,10 +69,15 @@ OPENAPI_SPEC=specs/my-api.yaml npm run api:test
 OpenAPI / Swagger
       |
       v
-Swagger Parser
+Swagger Parser + dereference
       |
       v
-Test Generator
+Contract-aware Test Designer
+      |
+      +---- Positive
+      +---- Negative
+      +---- Boundary
+      +---- Contract
       |
       v
 Playwright .spec.js
@@ -57,11 +86,11 @@ Playwright .spec.js
 APIRequestContext
       |
       v
-HTML Report
+HTML Report + Test Manifest
 ```
 
-## Notes
+## DemoQA
 
-This first version deliberately keeps generation deterministic and specification-driven. The next iterations can add schema-aware negative cases, parameter boundary tests, authentication handling, reusable test data, richer assertions, and optional AI-assisted scenario design.
+Swagger UI: https://demoqa.com/swagger
 
-DemoQA: https://demoqa.com/swagger
+The checked-in YAML is a deterministic seed specification for the framework. For a different API, replace it with the API's actual OpenAPI JSON/YAML document and run `npm run api:test`.
