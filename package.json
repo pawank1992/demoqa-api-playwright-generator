@@ -1,0 +1,17 @@
+{
+  "name": "demoqa-api-playwright-generator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Spec-driven API test generation and execution using OpenAPI/Swagger and Playwright.",
+  "scripts": {
+    "generate": "node generator/index.js",
+    "test": "playwright test",
+    "api:test": "npm run generate && playwright test",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@apidevtools/swagger-parser": "^12.0.0",
+    "@playwright/test": "^1.62.1",
+    "js-yaml": "^4.1.0"
+  }
+}
