@@ -1,0 +1,107 @@
+openapi: 3.0.0
+info:
+  title: DemoQA API
+  version: 1.0.0
+  description: Seed OpenAPI document for the spec-driven Playwright API generator.
+servers:
+  - url: https://demoqa.com
+paths:
+  /Account/v1/GenerateToken:
+    post:
+      summary: Generate an authentication token
+      operationId: generateToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Credentials'
+            example:
+              userName: demo-user
+              password: demo-password
+      responses:
+        '200':
+          description: Token response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  expires:
+                    type: string
+                  status:
+                    type: string
+                  result:
+                    type: string
+        '400':
+          description: Invalid credentials
+  /BookStore/v1/Books:
+    get:
+      summary: Get all books
+      operationId: getBooks
+      responses:
+        '200':
+          description: Books response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [books]
+                properties:
+                  books:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Book'
+  /BookStore/v1/Book:
+    post:
+      summary: Add a book
+      operationId: addBook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId, collectionOfIsbns]
+              properties:
+                userId:
+                  type: string
+                collectionOfIsbns:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [isbn]
+                    properties:
+                      isbn:
+                        type: string
+      responses:
+        '201':
+          description: Book created
+        '400':
+          description: Invalid request
+components:
+  schemas:
+    Credentials:
+      type: object
+      required: [userName, password]
+      properties:
+        userName:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+    Book:
+      type: object
+      properties:
+        isbn:
+          type: string
+        title:
+          type: string
+        subTitle:
+          type: string
+        author:
+          type: string
